@@ -1,3 +1,7 @@
+import PageHeader from '../../components/PageHeader';
+
 export default function EditContact() {
-  return 'EditContactPage';
+  return (
+    <PageHeader title="Editar Romário Alves" />
+  );
 }
