@@ -9,10 +9,11 @@ import arrow from '../../assets/images/icons/arrow.svg';
 import delay from '../../utils/delay';
 
 import Loader from '../../components/Loader';
+import ContactsService from '../../services/ContactsService';
 
 export default function Home() {
   const [contacts, setContacts] = useState([]);
-  const [orderBy, setOrderBy] = useState('asc');
+  const [orderby, setOrderby] = useState('asc');
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
@@ -26,12 +27,9 @@ export default function Home() {
       try{
         setIsLoading(true);
 
-        const response = await fetch(`http://localhost:3001/contacts?orderBy=${orderBy}`);
+        const contactsList = await ContactsService.listContacts(orderby);
 
-        await delay(500);
-
-        const json = await response.json();
-        setContacts(json);
+        setContacts(contactsList);
       } catch (error) {
         console.log('Error: ',error);
       } finally {
@@ -39,17 +37,17 @@ export default function Home() {
       }
     }
     loadContacts();
-  }, [orderBy]);
+  }, [orderby]);
 
   function handleToggleOrderBy() {
-    setOrderBy((prevState) => prevState === 'asc' ? 'desc' : 'asc')
+    setOrderby((prevState) => prevState === 'asc' ? 'desc' : 'asc')
   }
 
   function handleChangeSearchTerm(event) {
     setSearchTerm(event.target.value);
   }
 
-  console.log(orderBy);
+  console.log(orderby);
   return (
     <Container>
       <Loader isLoading={isLoading} />
@@ -69,7 +67,7 @@ export default function Home() {
       </Header>
 
       {filteredContacts.length > 0 && (
-        <ListHeader orderBy={orderBy}>
+        <ListHeader orderby={orderby}>
           <button type="button" onClick={handleToggleOrderBy} className="sort-button">
             <span>Nome</span>
             <img src={arrow} alt="arrow" />
