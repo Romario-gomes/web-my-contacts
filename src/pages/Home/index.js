@@ -7,7 +7,7 @@ import {
   InputSearchContainer,
   ErrorContainer
 } from './styles';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import trash from '../../assets/images/icons/trash.svg';
 import edit from '../../assets/images/icons/edit.svg';
 import arrow from '../../assets/images/icons/arrow.svg';
@@ -15,6 +15,7 @@ import sad from '../../assets/images/sad.svg';
 
 
 import Loader from '../../components/Loader';
+import Button from '../../components/Button';
 import ContactsService from '../../services/ContactsService';
 
 export default function Home() {
@@ -28,23 +29,24 @@ export default function Home() {
     contact.name.toLowerCase().includes(searchTerm.toLowerCase())
   )), [contacts, searchTerm]);
 
+  const loadContacts = useCallback(async () => {
+    try{
+      setIsLoading(true);
+
+      const contactsList = await ContactsService.listContacts(orderby);
+
+      setContacts(contactsList);
+      setHasError(false);
+    } catch (error) {
+      setHasError(true);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    async function loadContacts() {
-      try{
-        setIsLoading(true);
-
-        const contactsList = await ContactsService.listContacts(orderby);
-
-        setContacts(contactsList);
-      } catch (error) {
-        setHasError(true);
-      } finally {
-        setIsLoading(false);
-      }
-    }
     loadContacts();
-  }, [orderby]);
+  }, [loadContacts]);
 
   function handleToggleOrderBy() {
     setOrderby((prevState) => prevState === 'asc' ? 'desc' : 'asc')
@@ -52,6 +54,10 @@ export default function Home() {
 
   function handleChangeSearchTerm(event) {
     setSearchTerm(event.target.value);
+  }
+
+  function handleTryAgain() {
+    loadContacts();
   }
 
   return (
@@ -78,39 +84,48 @@ export default function Home() {
       { hasError && (
         <ErrorContainer>
           <img src={sad} alt="sad" />
+          <div className="details">
+            <strong>Ocorreu um erro ao obter os seus contatos!</strong>
+
+            <Button type="button" onClick={handleTryAgain}>Tentar novamente</Button>
+          </div>
         </ErrorContainer>
       ) }
 
-      {filteredContacts.length > 0 && (
+      { !hasError && (
+        <>
+        {filteredContacts.length > 0 && (
         <ListHeader orderby={orderby}>
           <button type="button" onClick={handleToggleOrderBy} className="sort-button">
             <span>Nome</span>
             <img src={arrow} alt="arrow" />
           </button>
         </ListHeader>
-      )}
-      {filteredContacts.map((contact) => (
-        <Card key={contact.id}>
-          <div className="info">
-            <div className="contact-name">
-              <strong>{contact.name}</strong>
-              {contact.category_name && (
-                <small>{contact.category_name}</small>
-              )}
+        )}
+        {filteredContacts.map((contact) => (
+          <Card key={contact.id}>
+            <div className="info">
+              <div className="contact-name">
+                <strong>{contact.name}</strong>
+                {contact.category_name && (
+                  <small>{contact.category_name}</small>
+                )}
+              </div>
+              <span>{contact.email}</span>
+              <span>{contact.phone}</span>
             </div>
-            <span>{contact.email}</span>
-            <span>{contact.phone}</span>
-          </div>
-          <div className="actions">
-            <Link to={`/edit/${contact.id}`}>
-              <img src={edit} alt="Edit" />
-            </Link>
-            <button type="button">
-              <img src={trash} alt="Delete" />
-            </button>
-          </div>
-        </Card>
-      ))}
+            <div className="actions">
+              <Link to={`/edit/${contact.id}`}>
+                <img src={edit} alt="Edit" />
+              </Link>
+              <button type="button">
+                <img src={trash} alt="Delete" />
+              </button>
+            </div>
+          </Card>
+        ))}
+      </>
+      ) }
     </Container>
   );
 }
