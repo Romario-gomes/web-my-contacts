@@ -18,8 +18,9 @@ export default function ContactForm({ buttonLabel }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [category, setCategory] = useState('');
+  const [categoryId, setCategoryId] = useState('');
   const [categories, setCategories] = useState([]);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(true);
 
   const { setError, removeError, getErrorsMessageByFieldName, errors } = useErrors();
 
@@ -29,9 +30,12 @@ export default function ContactForm({ buttonLabel }) {
 
   useEffect(() => {
     async function loadCategories() {
-      const categoriesList = await CategoriesService.listCategories();
-
-      setCategories(categoriesList);
+      try {
+        const categoriesList = await CategoriesService.listCategories();
+        setCategories(categoriesList);
+      } catch {} finally {
+        setIsLoadingCategories(false);
+      }
     }
 
     loadCategories();
@@ -74,7 +78,7 @@ export default function ContactForm({ buttonLabel }) {
   function handleSubmit(event) {
     event.preventDefault();
     console.log({
-      name, email, phone, category,
+      name, email, phone, categoryId,
     });
   }
 
@@ -105,10 +109,11 @@ export default function ContactForm({ buttonLabel }) {
         />
       </FormGroup>
 
-      <FormGroup>
+        <FormGroup isLoading={isLoadingCategories}>
         <Select
-          value={category}
-          onChange={(event) => { setCategory(event.target.value); }}
+          value={categoryId}
+          onChange={(event) => { setCategoryId(event.target.value); }}
+          disabled={isLoadingCategories}
         >
           <option value="">Sem categoria</option>
           {categories.map((category) => (
