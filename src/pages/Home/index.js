@@ -81,7 +81,7 @@ export default function Home() {
 
 
 
-      <Header justifyContent={
+      <Header justifycontent={
           hasError ?
             'flex-end'
             : (

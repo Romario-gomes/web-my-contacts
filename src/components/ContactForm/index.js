@@ -14,7 +14,7 @@ import Button from '../Button';
 import useErrors from '../../hooks/useErrors';
 import formatPhone from '../../utils/FormatPhone';
 
-export default function ContactForm({ buttonLabel }) {
+export default function ContactForm({ buttonLabel, onSubmit }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -65,21 +65,12 @@ export default function ContactForm({ buttonLabel }) {
 
   function handlePhoneChange(event) {
     setPhone(formatPhone(event.target.value));
-
-    formatPhone()
-
-    if(event.target.value && !isEmailValid(event.target.value)) {
-      setError({ field: 'email', message: 'E-mail inválido.' })
-    } else {
-      removeError('email');
-    }
   }
 
   function handleSubmit(event) {
     event.preventDefault();
-    console.log({
-      name, email, phone, categoryId,
-    });
+
+    onSubmit({ name, email, phone, categoryId })
   }
 
   return (
@@ -133,4 +124,5 @@ export default function ContactForm({ buttonLabel }) {
 
 ContactForm.propTypes = {
   buttonLabel: PropTypes.string.isRequired,
+  onSubmit:  PropTypes.func.isRequired,
 };
