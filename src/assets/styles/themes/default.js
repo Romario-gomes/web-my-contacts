@@ -19,5 +19,8 @@ export default {
       light: '#F97171',
       main: '#FC5050',
     },
+    success: {
+      main: '#51CA73',
+    }
   },
 };
