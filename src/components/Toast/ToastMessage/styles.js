@@ -7,6 +7,7 @@ const containerVariant = {
 };
 
 export const Container = styled.div`
+  cursor: pointer;
   padding: 16px 32px;
   background: ${({ theme }) => theme.colors.primary.main};
   color: #fff;
@@ -15,6 +16,10 @@ export const Container = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+
+  &:focus{
+
+  }
 
   ${({ type }) => containerVariant[type] || containerVariant.default}
   & + & {
