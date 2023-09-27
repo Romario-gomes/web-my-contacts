@@ -8,7 +8,7 @@ import toast from '../../utils/toast';
 
 export default function EditContact() {
   const [isLoading, setIsLoading] = useState(true);
-  const contactFormeRef = useRef(null);
+  const contactFormRef = useRef(null);
 
   const { id } = useParams();
   const history = useHistory();
@@ -20,6 +20,7 @@ export default function EditContact() {
           id
         );
 
+        contactFormRef.current.setFieldsValues(contact);
         setIsLoading(false);
       } catch {
         history.push('/')
@@ -46,7 +47,7 @@ export default function EditContact() {
       <PageHeader title="Editar Romário Alves" />
       <ContactForm
         buttonLabel="Salvar alterações"
-        ref={contactFormeRef}
+        ref={contactFormRef}
         onSubmit={handleSubmit}
       />
     </>

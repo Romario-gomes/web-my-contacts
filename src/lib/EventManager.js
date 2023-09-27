@@ -36,6 +36,3 @@ export default class EventManager {
     this.listeners.set(filteredListeners);
   }
 }
-
-const toastEventManager = new EventManager();
-console.log(toastEventManager);

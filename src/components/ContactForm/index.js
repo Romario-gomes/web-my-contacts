@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, forwardRef, useImperativeHandle } from 'react';
 
 import isEmailValid from '../../utils/isEmailValid';
 
@@ -15,7 +15,8 @@ import useErrors from '../../hooks/useErrors';
 import formatPhone from '../../utils/FormatPhone';
 import Spinner from '../Spinner';
 
-export default function ContactForm({ buttonLabel, onSubmit }) {
+
+const ContactForm = forwardRef(({ buttonLabel, onSubmit }, ref) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -29,27 +30,36 @@ export default function ContactForm({ buttonLabel, onSubmit }) {
 
   const isFormValid = (name && errors.length === 0);
 
+  useImperativeHandle(ref, () => ({
+    setFieldsValues: (contact) => {
+      setName(contact.name);
+      setEmail(contact.email);
+      setPhone(contact.phone);
+      setCategoryId(contact.category_id);
+    }
+  }), [ref]);
+
 
   useEffect(() => {
     async function loadCategories() {
       try {
         const categoriesList = await CategoriesService.listCategories();
         setCategories(categoriesList);
-      } catch {} finally {
+      } catch { } finally {
         setIsLoadingCategories(false);
       }
     }
 
     loadCategories();
- }, []);
+  }, []);
 
 
   function handleNameChange(event) {
     setName(event.target.value);
 
-    if(!event.target.value) {
+    if (!event.target.value) {
       setError({ field: 'name', message: 'Nome é obrigatório.' });
-    } else{
+    } else {
       removeError('name');
     }
   }
@@ -57,7 +67,7 @@ export default function ContactForm({ buttonLabel, onSubmit }) {
   function handleEmailChange(event) {
     setEmail(event.target.value);
 
-    if(event.target.value && !isEmailValid(event.target.value)) {
+    if (event.target.value && !isEmailValid(event.target.value)) {
       setError({ field: 'email', message: 'E-mail inválido.' })
     } else {
       removeError('email');
@@ -113,7 +123,7 @@ export default function ContactForm({ buttonLabel, onSubmit }) {
         />
       </FormGroup>
 
-        <FormGroup isLoading={isLoadingCategories}>
+      <FormGroup isLoading={isLoadingCategories}>
         <Select
           value={categoryId}
           onChange={(event) => { setCategoryId(event.target.value); }}
@@ -128,16 +138,19 @@ export default function ContactForm({ buttonLabel, onSubmit }) {
 
       <ButtonContainer>
         <Button type="submit" disabled={!isFormValid || isSubmitting}>
-          { !isSubmitting && buttonLabel }
-          { isSubmitting && <Spinner size={16}/> }
+          {!isSubmitting && buttonLabel}
+          {isSubmitting && <Spinner size={16} />}
 
         </Button>
       </ButtonContainer>
     </Form>
   );
-}
+});
+
 
 ContactForm.propTypes = {
   buttonLabel: PropTypes.string.isRequired,
-  onSubmit:  PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
 };
+
+export default ContactForm;
