@@ -16,6 +16,7 @@ import arrow from '../../assets/images/icons/arrow.svg';
 import sad from '../../assets/images/sad.svg';
 import emptyBox from '../../assets/images/empty-box.svg';
 import magnifierQuestion from '../../assets/images/magnifier-question.svg';
+import Modal from '../../components/Modal';
 
 
 import Loader from '../../components/Loader';
@@ -69,6 +70,13 @@ export default function Home() {
   return (
     <Container>
       <Loader isLoading={isLoading} />
+      <Modal
+        danger
+        title="Tem certeza que deseja remover o contato 'Romário Alves'?"
+        confirmLabel="Deletar"
+        onCancel={() => alert('Cancelou')}
+        onConfirm={() => alert('Teste')}
+      />
       {contacts.length > 0 && (
         <InputSearchContainer>
           <input value={searchTerm}
