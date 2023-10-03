@@ -3,21 +3,22 @@ import { Overlay, Container, Footer } from './styles';
 import Button from '../Button';
 import ReactDOM from 'react-dom';
 
-export default function Modal({ danger, title, children, cancelLabel, confirmLabel, onCancel, onConfirm }) {
+export default function Modal({ danger, visible, isLoading, title, children, cancelLabel, confirmLabel, onCancel, onConfirm }) {
+  if(!visible) {
+    return null
+  }
   return ReactDOM.createPortal(
     <Overlay>
       <Container danger={danger}>
         <h1>{title}</h1>
 
         <div className="modal-body">
-        a
-
+          {children}
         </div>
 
-        {children}
         <Footer>
-          <button type="button" className="cancel-button" onClick={onCancel}>{cancelLabel}</button>
-          <Button type="button" onClick={onConfirm} danger={danger}>{confirmLabel}</Button>
+          <button type="button" className="cancel-button" disabled={isLoading} onClick={onCancel}>{cancelLabel}</button>
+          <Button type="button" disabled={isLoading} onClick={onConfirm} isLoading={isLoading} danger={danger}>{confirmLabel}</Button>
         </Footer>
       </Container>
     </Overlay>,
@@ -28,6 +29,8 @@ export default function Modal({ danger, title, children, cancelLabel, confirmLab
 
 Modal.propTypes = {
   danger: PropTypes.bool,
+  visible: PropTypes.bool.isRequired,
+  isLoading: PropTypes.bool,
   title: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
   cancelLabel: PropTypes.string,
@@ -39,6 +42,7 @@ Modal.propTypes = {
 
 Modal.defaultProps = {
   danger: false,
+  isLoading: false,
   cancelLabel: 'Cancelar',
   confirmLabel: 'Confirmar'
 };
